@@ -45,6 +45,28 @@ public class MainActivity extends AppCompatActivity {
         }   else {
             mlogTextview.setText("First time here?");
         }
+
+        // Set up navigation programatically instead of from activity_main.xml
+        // The id of the button (in activity_main.xml is "questionB" (B as in button)
+        // Now create a textview object which reference this button id
+        TextView qbutton = findViewById(R.id.questionB);
+        // Next, set up the listener for the click event
+        qbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mlogTextview.setText("Clicked Question-button");
+                // Create an intent
+                // Note that we need to use MainActivity.this and not only this
+                // Reason is that "this" would refer to the onClick listener object
+                // which is not what we want to reference
+                // Second argument is the class of the activity we want to navigate to
+                Intent intent = new Intent(MainActivity.this, QuestionActivity.class);
+                startActivity(intent);
+                
+            }
+        });
+
+
     }
 
     private void logMessage(String message) {
@@ -71,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
     public void GotoSettings(View view) {
         // Action for "GotoLights button"
         // Takes us to SettingsActivity
+        // Set up in activity_main.xml instead of programatically
         mlogTextview.append("\n"+"Light time!");
         // Create a new intent with the destination activity object as a paramater
         Intent intent = new Intent(this, SettingsActivity.class);

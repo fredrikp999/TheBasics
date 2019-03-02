@@ -10,8 +10,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".QuestionActivity"
+            android:parentActivityName=".MainActivity"
+        />
+        <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_lights"></activity>
+            android:label="@string/title_activity_lights"
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
