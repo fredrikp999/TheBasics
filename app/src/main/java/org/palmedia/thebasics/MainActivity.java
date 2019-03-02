@@ -16,6 +16,7 @@ But I guess this will be good at some point...
  */
 
 public class MainActivity extends AppCompatActivity {
+    public static final String QUESTION_KEY = "question_key";
     // Declare mlogTextview as a textview component
     // so that we can get assign a reference to it further down
     private TextView mlogTextview;
@@ -55,12 +56,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mlogTextview.setText("Clicked Question-button");
-                // Create an intent
+                // Create an intent which we can use to start the activity
                 // Note that we need to use MainActivity.this and not only this
                 // Reason is that "this" would refer to the onClick listener object
                 // which is not what we want to reference
                 // Second argument is the class of the activity we want to navigate to
                 Intent intent = new Intent(MainActivity.this, QuestionActivity.class);
+                // Pass in some data to the activity using putExtra()
+                // With this, we can pass int, string, arrays etc.
+                // When creating this, you can get help from AndroidStudio by writing
+                // intent.putExtra("question_key") - and then right click and select
+                // Refactor --> Constant
+                // This will change your "question_key" into:
+                // public static final String QUESTION_KEY = "question_key";
+                // and add the key below instead. (This can of course be done manually as well)
+                // Reason for the public key is so that it can be referenced from the other activity
+                intent.putExtra(QUESTION_KEY, "What is the number of the Beast?");
                 startActivity(intent);
                 
             }
