@@ -9,6 +9,8 @@ import android.widget.TextView;
 import android.util.Log;
 // Needed for navigation and using the Intent object
 import android.content.Intent;
+// To make Toast badges possible
+import android.widget.Toast;
 
 /* This app contains the basics for creating an android app
 It contains a lot of comments on how this works to an almost silly level
@@ -16,6 +18,7 @@ But I guess this will be good at some point...
  */
 
 public class MainActivity extends AppCompatActivity {
+    // Defining a key which is used to pass back response. The string assigned does not matter
     public static final String QUESTION_KEY = "question_key";
     // Declare mlogTextview as a textview component
     // so that we can get assign a reference to it further down
@@ -24,6 +27,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
     // Define the key used to store a string for state changes
     public static final String LOG_TEXT_KEY = "An empty string here";
+    // Defining a key which is used to pass back response from the question activity
+    // It does not matter what value it is assigned
+    public static final int ANSWER_REQUEST = 1000;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,12 +80,34 @@ public class MainActivity extends AppCompatActivity {
                 // and add the key below instead. (This can of course be done manually as well)
                 // Reason for the public key is so that it can be referenced from the other activity
                 intent.putExtra(QUESTION_KEY, "What is the number of the Beast?");
-                startActivity(intent);
+
+                // If we were only to start the activity without wanting any result, we we
+                // start it using: startActivity(intent);
+                // Then you would also not have to define the public static final int REPONSE_REQUEST
+                // or public static final String RESPONSE_KEY
+                // However, let's kick the activity off in a way where we can get a response back:
+                startActivityForResult(intent, ANSWER_REQUEST);
+
                 
             }
         });
 
 
+    }
+
+    // Handle the returned data e.g. from QuestionActivity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ANSWER_REQUEST && resultCode == RESULT_OK){
+            // If the requestCode shows this is the response back
+            // from the QuestionActivity, for which we used this requestCode
+            // and we got a good response, then get the string returned:
+            String AnswerText = data.getStringExtra(QUESTION_KEY);
+            // Display the answer entered in a Toaster
+            Toast.makeText(this, "You did answer: "+ AnswerText, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void logMessage(String message) {
