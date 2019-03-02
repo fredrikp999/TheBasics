@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.TextView;
 // Needs to be imported for logcat logging
 import android.util.Log;
+// Needed for navigation and using the Intent object
+import android.content.Intent;
 
 /* This app contains the basics for creating an android app
 It contains a lot of comments on how this works to an almost silly level
@@ -66,6 +68,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void GotoSettings(View view) {
+        // Action for "GotoLights button"
+        // Takes us to SettingsActivity
+        mlogTextview.append("\n"+"Light time!");
+        // Create a new intent with the destination activity object as a paramater
+        Intent intent = new Intent(this, SettingsActivity.class);
+        // And start the actual activity by passing the intent object containing ref to activity
+        startActivity(intent);
+
+    }
+
     public void PrintStory(View view) {
         // This is the OnClick action for the button
         // That this method is called when the button is clicked
@@ -75,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         // Enable vertical scrolling for the textview component
         mlogTextview.setMovementMethod(new ScrollingMovementMethod());
 
-        mlogTextview.setText("Hi there!");
+        mlogTextview.append("\n"+"Hi there!");
         logMessage("BUTTON pressed");
     }
 }
