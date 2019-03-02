@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 // Needed for navigation and us
 import android.content.Intent;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 public class QuestionActivity extends AppCompatActivity {
@@ -18,6 +19,11 @@ public class QuestionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
+
+        // Change the "up button" icon to a checkmark instead
+        // (First add this by New-->Vector_asset and choose your icon + name it)
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_checkmark);
+
         // Get a reference to the activity which called this activity
         Intent intent = getIntent();
         // Get the String passed to us using setExtra method
@@ -45,9 +51,19 @@ public class QuestionActivity extends AppCompatActivity {
         intent.putExtra(MainActivity.QUESTION_KEY, answerTextToReturn);
         // Set the return code to RESULT_OK and include the intent which contains variable to return
         setResult(RESULT_OK, intent);
-        super.onBackPressed();
+        finish();
+    }
 
-
-        // CONTINUE HERE!!!
+    // Here we code what actions to take when items in the action-bar (at the top of the screen)
+    // is selected. E.g. the "up"/home-button
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        if(item.getItemId() == android.R.id.home){
+            // If the home button is pressed, execute onBackPressed
+            onBackPressed();
+            return true;
+        }
+        //
+        return super.onOptionsItemSelected(item);
     }
 }

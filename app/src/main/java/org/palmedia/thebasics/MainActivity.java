@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         qbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mlogTextview.setText("Clicked Question-button");
+                mlogTextview.append("\n"+"Clicked Question-button");
                 // Create an intent which we can use to start the activity
                 // Note that we need to use MainActivity.this and not only this
                 // Reason is that "this" would refer to the onClick listener object
@@ -107,6 +107,14 @@ public class MainActivity extends AppCompatActivity {
             String AnswerText = data.getStringExtra(QUESTION_KEY);
             // Display the answer entered in a Toaster
             Toast.makeText(this, "You did answer: "+ AnswerText, Toast.LENGTH_LONG).show();
+            mlogTextview.append("\n" + "Your answer: "+AnswerText);
+            // Check if the answer was correct or not + write that to the log-window
+            if (AnswerText.equals("666")) {
+                mlogTextview.append("\n" + "Right answer, congrats!");
+            }
+            else {
+                 mlogTextview.append("\n" + "Sorry, wrong answer");
+            }
         }
     }
 
