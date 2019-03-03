@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
@@ -45,7 +47,21 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver br;
 
 
+    // Set up a broadcast receiver for local broadcasts (sent from MyIntentService in this example)
+    BroadcastReceiver mLocalReceiver =
+            new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    // Get the string (message) passed on as StringExtra from the sender
+                    String message = intent.getStringExtra(
+                            MyIntentService.MESSAGE_KEY
+                    );
+                    logMessage("Received:" + message);
 
+
+                    
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,6 +173,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
+        // Register a receiver for the local message from MyIntentService
+        // Listen to the specific event name as published from the service sender
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .registerReceiver(mLocalReceiver, new IntentFilter("myown-intent"));
     }
 
     /*
@@ -165,7 +186,12 @@ public class MainActivity extends AppCompatActivity {
     */
     @Override
     protected void onDestroy(){
+        // Unregister the broadcast receiver
         unregisterReceiver(br);
+        // Unregister the local receiver
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .unregisterReceiver(mLocalReceiver);
+        
         super.onDestroy();
     }
 
@@ -193,7 +219,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logMessage(String message) {
+        // Add an entry in the logcat
+        // TAG is indicating this specific activity/module
         Log.i(TAG, message);
+        // Add an entry in the logging-window in the app
+        mlogTextview.append("\n" + message);
+
+        // Adjust scroll position to make last line visible
+        Layout layout = mlogTextview.getLayout();
+        if (layout != null){
+            int scrollAmount = layout.getLineTop(mlogTextview.getLineCount()) - mlogTextview.getHeight();
+            mlogTextview.scrollTo(0, scrollAmount > 0 ? scrollAmount : 0);
+        }
+
     }
 
     @Override
@@ -259,5 +297,16 @@ public class MainActivity extends AppCompatActivity {
                Toast.makeText(MainActivity.this, "Other broadcast received", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    public void runCode(View view){
+        // This is to test sending local messages in the same app
+        // In this case between an activity and a service (MyIntentService)
+        // This so that the service can do something and then return some data
+        
+        // Create a new intent pointing to the service class to execute
+        Intent intent = new Intent(this, MyIntentService.class);
+        // and start the service
+        startService(intent);
     }
 }
