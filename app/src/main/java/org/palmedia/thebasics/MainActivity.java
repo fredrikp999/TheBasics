@@ -57,9 +57,6 @@ public class MainActivity extends AppCompatActivity {
                             MyIntentService.MESSAGE_KEY
                     );
                     logMessage("Received:" + message);
-
-
-                    
                 }
             };
 
@@ -191,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
         // Unregister the local receiver
         LocalBroadcastManager.getInstance(getApplicationContext())
                 .unregisterReceiver(mLocalReceiver);
-        
         super.onDestroy();
     }
 
@@ -210,10 +206,10 @@ public class MainActivity extends AppCompatActivity {
             mlogTextview.append("\n" + "Your answer: "+AnswerText);
             // Check if the answer was correct or not + write that to the log-window
             if (AnswerText.equals("666")) {
-                mlogTextview.append("\n" + "Right answer, congrats!");
+                logMessage("Right answer, congrats!");
             }
             else {
-                 mlogTextview.append("\n" + "Sorry, wrong answer");
+                 logMessage("Sorry, wrong answer");
             }
         }
     }
@@ -254,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         // Action for "GotoLights button"
         // Takes us to SettingsActivity
         // Set up in activity_main.xml instead of programatically
-        mlogTextview.append("\n"+"Light time!");
+        logMessage("Light time!");
         // Create a new intent with the destination activity object as a paramater
         Intent intent = new Intent(this, SettingsActivity.class);
         // And start the actual activity by passing the intent object containing ref to activity
@@ -285,7 +281,6 @@ public class MainActivity extends AppCompatActivity {
             // The intent contains more information such as "an action"
             // Let's just print it out for now
             logMessage("Action: "+ intent.getAction());
-            mlogTextview.append("\n"+"Action: "+intent.getAction());
 
             // If we have multiple broadcast actions we are listening to, we need to check
             // which action it was and take different actions based on that - like below
