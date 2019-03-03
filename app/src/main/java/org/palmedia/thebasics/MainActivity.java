@@ -1,5 +1,9 @@
 package org.palmedia.thebasics;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -36,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
     // Define a key for coordinates to use in google map as default
     // This is coordinates to Totemo Ramen, Stockholm for some reason
     public static final String COORDINATES ="59.3385284,18.0348237";
+    // Declare an instance of the broadcast receiver object
+    // We name it br
+    private BroadcastReceiver br;
+
 
 
 
@@ -61,6 +69,23 @@ public class MainActivity extends AppCompatActivity {
             mlogTextview.setText("First time here?");
         }
 
+        // -- BROADCAST RECEIVER START --
+        // Create an instance of the broadcast receiver so that it can be used
+        // to listen to broadcast messages such as battery low, connectivity change etc.
+        // (br is already declared higher up and the class is designed further down)
+        br = new MyBroadcastReceiver();
+        // Next, create an Intent filter to listen for only the broadcast messages
+        // which I am interested in. In this case when power is connected
+
+         // Well, registering without filter to see if something is received...
+        IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_CONNECTED);
+        // We could here add more things which we want to receive and trigger on
+        // to do this, just add more with .addAction like below:
+        filter.addAction(Intent.ACTION_BATTERY_LOW);
+        // To finally get it going, register the receiver to connect our broadcast receiver to the filter
+        registerReceiver(br, filter);
+        // -- BROADCAST RECEIVER END --
+
         // Set up navigation programatically instead of from activity_main.xml
         // The id of the button (in activity_main.xml is "questionB" (B as in button)
         // Now create a textview object which reference this button id
@@ -70,31 +95,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mlogTextview.append("\n"+"Clicked Question-button");
-                // Create an intent which we can use to start the activity
-                // Note that we need to use MainActivity.this and not only this
-                // Reason is that "this" would refer to the onClick listener object
-                // which is not what we want to reference
-                // Second argument is the class of the activity we want to navigate to
+                /*
+                Create an intent which we can use to start the activity
+                Note that we need to use MainActivity.this and not only this
+                Reason is that "this" would refer to the onClick listener object
+                which is not what we want to reference
+                Second argument is the class of the activity we want to navigate to
+                */
                 Intent intent = new Intent(MainActivity.this, QuestionActivity.class);
-                // Pass in some data to the activity using putExtra()
-                // With this, we can pass int, string, arrays etc.
-                // When creating this, you can get help from AndroidStudio by writing
-                // intent.putExtra("question_key") - and then right click and select
-                // Refactor --> Constant
-                // This will change your "question_key" into:
-                // public static final String QUESTION_KEY = "question_key";
-                // and add the key below instead. (This can of course be done manually as well)
-                // Reason for the public key is so that it can be referenced from the other activity
+                /*
+                Pass in some data to the activity using putExtra()
+                With this, we can pass int, string, arrays etc.
+                When creating this, you can get help from AndroidStudio by writing
+                intent.putExtra("question_key") - and then right click and select
+                Refactor --> Constant
+                This will change your "question_key" into:
+                public static final String QUESTION_KEY = "question_key";
+                and add the key below instead. (This can of course be done manually as well)
+                Reason for the public key is so that it can be referenced from the other activity
+                */
                 intent.putExtra(QUESTION_KEY, "What is the number of the Beast?");
 
-                // If we were only to start the activity without wanting any result, we we
-                // start it using: startActivity(intent);
-                // Then you would also not have to define the public static final int REPONSE_REQUEST
-                // or public static final String RESPONSE_KEY
-                // However, let's kick the activity off in a way where we can get a response back:
+                /*
+                If we were only to start the activity without wanting any result, we we
+                start it using: startActivity(intent);
+                Then you would also not have to define the public static final int REPONSE_REQUEST
+                or public static final String RESPONSE_KEY
+                However, let's kick the activity off in a way where we can get a response back:
+                */
                 startActivityForResult(intent, ANSWER_REQUEST);
-
-                
             }
          });
 
@@ -107,23 +136,37 @@ public class MainActivity extends AppCompatActivity {
                 // Create the uri in correct format
                 // ?z=zoomlevel is the zoom level, higher is more zoomed in
                 String zoomlevel = "?z=10";
-                // Adding &q=restaurants adds a listing of restaurants (duh...)
-                // so add this to your uri: "&q=restaurants"
-                // But you can of course search for just the name of a restaurant or other
-                // However, when using &q= the zoom level is not used - so choose...
+                /*
+                Adding &q=restaurants adds a listing of restaurants (duh...)
+                so add this to your uri: "&q=restaurants"
+                But you can of course search for just the name of a restaurant or other
+                However, when using &q= the zoom level is not used - so choose...
+                */
                 String showthings = "&q=totemo ramen";
                 //Uri uri = Uri.parse("geo:"+COORDINATES+zoomlevel);
                 Uri uri = Uri.parse("geo:"+showthings);
                 // Create an intent
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                // Start the activity to handle the Intent
-                // In this case, it is not handled by this app
-                // but by "some other app" on the device. It is up to the user
-                // The user configures/selects if e.g. google maps or google earth is used
+                /*
+                Start the activity to handle the Intent
+                In this case, it is not handled by this app
+                but by "some other app" on the device. It is up to the user
+                The user configures/selects if e.g. google maps or google earth is used
+                */
                 startActivity(intent);
             }
 
         });
+    }
+
+    /*
+    For broadcast messages handling, we also need to unregister the received
+    as the activity is destroyed
+    */
+    @Override
+    protected void onDestroy(){
+        unregisterReceiver(br);
+        super.onDestroy();
     }
 
     // Handle the returned data e.g. from QuestionActivity
@@ -166,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Now, execute the default method from parent class
         super.onSaveInstanceState(outstate);
-        
     }
 
 
@@ -193,5 +235,29 @@ public class MainActivity extends AppCompatActivity {
 
         mlogTextview.append("\n"+"Hi there!");
         logMessage("BUTTON pressed");
+    }
+
+    class MyBroadcastReceiver extends BroadcastReceiver {
+        // Class to handle broadcast messages such as battery low, connectivity change etc.
+        // This class will do nothing by itself. To make it active we need to
+        // instantiate it and make activate it (further up in this file)
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Context is the string identifying what it is about
+            // The intent contains more information such as "an action"
+            // Let's just print it out for now
+            logMessage("Action: "+ intent.getAction());
+            mlogTextview.append("\n"+"Action: "+intent.getAction());
+
+            // If we have multiple broadcast actions we are listening to, we need to check
+            // which action it was and take different actions based on that - like below
+            // Display this in a Toast. (Note that we have to use "MainActivity.this" and not "this")
+            if (intent.getAction().equals("android.intent.action.ACTION_POWER_CONNECTED")){
+                Toast.makeText(MainActivity.this, "Power connected", Toast.LENGTH_LONG).show();
+            }
+            else {
+               Toast.makeText(MainActivity.this, "Other broadcast received", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }
