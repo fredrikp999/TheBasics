@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 // Needs to be imported for logcat logging
 import android.util.Log;
@@ -11,6 +12,8 @@ import android.util.Log;
 import android.content.Intent;
 // To make Toast badges possible
 import android.widget.Toast;
+// To handle Uris, e.g. for maps
+import android.net.Uri;
 
 /* This app contains the basics for creating an android app
 It contains a lot of comments on how this works to an almost silly level
@@ -30,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
     // Defining a key which is used to pass back response from the question activity
     // It does not matter what value it is assigned
     public static final int ANSWER_REQUEST = 1000;
+    // Define a key for coordinates to use in google map as default
+    // This is coordinates to Totemo Ramen, Stockholm for some reason
+    public static final String COORDINATES ="59.3385284,18.0348237";
 
 
 
@@ -90,9 +96,34 @@ public class MainActivity extends AppCompatActivity {
 
                 
             }
+         });
+
+        // Find and reference the button which shall navigate to the map
+        Button mapbutton = findViewById(R.id.MapB);
+        // And set up the onClick listener for it
+        mapbutton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                // Create the uri in correct format
+                // ?z=zoomlevel is the zoom level, higher is more zoomed in
+                String zoomlevel = "?z=10";
+                // Adding &q=restaurants adds a listing of restaurants (duh...)
+                // so add this to your uri: "&q=restaurants"
+                // But you can of course search for just the name of a restaurant or other
+                // However, when using &q= the zoom level is not used - so choose...
+                String showthings = "&q=totemo ramen";
+                //Uri uri = Uri.parse("geo:"+COORDINATES+zoomlevel);
+                Uri uri = Uri.parse("geo:"+showthings);
+                // Create an intent
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                // Start the activity to handle the Intent
+                // In this case, it is not handled by this app
+                // but by "some other app" on the device. It is up to the user
+                // The user configures/selects if e.g. google maps or google earth is used
+                startActivity(intent);
+            }
+
         });
-
-
     }
 
     // Handle the returned data e.g. from QuestionActivity
